@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/kot32/Documents/学习/自己的开源库/KShareViewActivity/app/build/intermediates/exploded-aar/KShareViewActivity/kshareviewactivitylibrary/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="fedc9f67010bd8df0f56367a586a42acef2f7bf3">
+        <dex dex="/Users/kot32/Documents/学习/自己的开源库/KShareViewActivity/app/build/intermediates/pre-dexed/debug/classes-21f3f4f7442792978b7574016ecaa9b90f0b4919.jar" />
+    </item>
+
+</items>
