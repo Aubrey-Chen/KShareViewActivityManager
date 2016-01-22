@@ -5,6 +5,8 @@
 
 图片地址：http://i4.tietuku.com/71be280654257885.gif
 
+先说缺点吧：在第一个Activity 中的目标View 是wrap_content 时，位移会偏移一点点
+
 使用方法：
 
 1.在第一个Activity中：
