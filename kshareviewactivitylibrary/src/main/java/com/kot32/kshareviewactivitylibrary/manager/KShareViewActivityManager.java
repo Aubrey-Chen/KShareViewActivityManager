@@ -4,13 +4,16 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +26,7 @@ import com.kot32.kshareviewactivitylibrary.actions.KShareViewActivityAction;
 import java.util.HashMap;
 
 /**
- * Created by kot32 on 16/1/21.
- * FirstActivity 中的View 暂不支持 WRAP_CONTENT
- * SecondActivity 中的View 可以
+ * Created by kot32 on 16/1/21. FirstActivity 中的View 暂不支持 WRAP_CONTENT ,SecondActivity 中的View 可以
  */
 public class KShareViewActivityManager {
 
@@ -42,6 +43,10 @@ public class KShareViewActivityManager {
     private ViewGroup                        secondActivityLayout;
 
     private long                             duration       = 500;
+
+    private boolean                          isMatchedFirst;
+
+    private boolean                          isMatchSecond;
 
     {
         replaceViewHandler = new Handler() {
@@ -69,11 +74,25 @@ public class KShareViewActivityManager {
 
     private static KShareViewActivityManager INSTANCE;
 
-    public static KShareViewActivityManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new KShareViewActivityManager();
+    /**
+     * 每两个Activity 对应一个Manager
+     * 
+     * @return
+     */
+    public static KShareViewActivityManager getInstance(Activity activity) {
+
+        if (INSTANCE != null && INSTANCE.one != null && INSTANCE.two != null) {
+
+            INSTANCE.isMatchedFirst = activity.equals(INSTANCE.one);
+            INSTANCE.isMatchSecond = (activity.getLocalClassName().equals(INSTANCE.two.getSimpleName()));
+
+            if (INSTANCE.isMatchedFirst || INSTANCE.isMatchSecond) {
+                return INSTANCE;
+            }
         }
+        INSTANCE = new KShareViewActivityManager();
         return INSTANCE;
+
     }
 
     /**
@@ -91,7 +110,7 @@ public class KShareViewActivityManager {
         // oAReflect.set("mInstrumentation", new AnimationInstrumentation(instrumentation));
         this.shareViews.clear();
         this.shareViewPairs.clear();
-        
+
         this.one = one;
         this.two = two;
         for (View v : shareViews) {
@@ -103,6 +122,21 @@ public class KShareViewActivityManager {
         beforeAnimation();
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void finish(Activity finishActivity) {
+        if (isMatchedFirst || one.isDestroyed()) {
+            Log.e("警告", "不能在这个页面调用finish 动画");
+            finishActivity.finish();
+            return;
+        }
+        if (isMatchSecond) {
+            kShareViewActivityAction.onAnimatorStart();
+            finishActivityAnimation(finishActivity);
+            one = null;
+            two = null;
+        }
+    }
+
     private void startIntent() {
         Intent i = new Intent(one, two);
         one.startActivity(i);
@@ -112,6 +146,7 @@ public class KShareViewActivityManager {
      * 位移前测量各种数据
      */
     private void beforeAnimation() {
+
         findAllTargetViews(secondActivityLayout);
         final int[] currentIndex = { 0 };
 
@@ -136,7 +171,7 @@ public class KShareViewActivityManager {
                                                           getViewLocationOnScreen(viewInfo.view)[1]);
                     synchronized (currentIndex) {
                         if (currentIndex[0] == shareViewPairs.values().size() - 1) {
-                            startAnimation();
+                            startActivityAnimation();
                         }
                         currentIndex[0]++;
                     }
@@ -146,15 +181,16 @@ public class KShareViewActivityManager {
 
         }
 
-    }
-
-    private void startAnimation() {
-
-        final int[] currentIndex = { 0 };
-        
         kShareViewActivityAction.onAnimatorStart();
 
+    }
+
+    private void startActivityAnimation() {
+
+        final int[] currentIndex = { 0 };
+
         for (final View v : shareViewPairs.keySet()) {
+
             final ShareViewInfo pair = shareViewPairs.get(v);
 
             float ratioX = pair.width / v.getWidth();
@@ -201,6 +237,73 @@ public class KShareViewActivityManager {
                                 if (currentIndex[0] == shareViewPairs.keySet().size() - 1) {
                                     kShareViewActivityAction.onAnimatorEnd();
                                     startIntent();
+                                    replaceViewHandler.sendEmptyMessageDelayed(1, 500);
+                                }
+                                currentIndex[0]++;
+                            }
+                        }
+                    });
+                    transAnimator.start();
+                }
+            });
+            scaleAnimator.start();
+
+        }
+    }
+
+    private void finishActivityAnimation(final Activity target) {
+        final int[] currentIndex = { 0 };
+
+        for (final View v : shareViewPairs.keySet()) {
+
+            final ShareViewInfo pair = shareViewPairs.get(v);
+
+            float ratioX = v.getWidth() / pair.width;
+            float ratioY = v.getHeight() / pair.height;
+
+            final View sourceView = target.getWindow().getDecorView().findViewWithTag(pair.view.getTag());
+
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(sourceView, "scaleX", ratioX);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(sourceView, "scaleY", ratioY);
+
+            // 放大
+            AnimatorSet scaleAnimator = new AnimatorSet();
+            scaleAnimator.setDuration(duration / 3);
+            scaleAnimator.playTogether(scaleX, scaleY);
+            scaleAnimator.addListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    ViewGroup baseFrameLayout = (ViewGroup) target.findViewById(Window.ID_ANDROID_CONTENT);
+                    baseFrameLayout.removeView(secondActivityLayout);
+
+                    ObjectAnimator translationX = ObjectAnimator.ofFloat(sourceView,
+                                                                         "translationX",
+                                                                         (getViewLocationOnScreen(v)[0] - getViewLocationOnScreen(sourceView)[0]));
+
+                    ObjectAnimator translationY = ObjectAnimator.ofFloat(sourceView,
+                                                                         "translationY",
+                                                                         (getViewLocationOnScreen(v)[1] - getViewLocationOnScreen(sourceView)[1]));
+
+                    AnimatorSet transAnimator = new AnimatorSet();
+                    transAnimator.setDuration(duration / 3 * 2);
+                    transAnimator.playTogether(translationX, translationY);
+                    transAnimator.addListener(new AnimatorListenerAdapter() {
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            synchronized (currentIndex) {
+
+                                if (currentIndex[0] == shareViewPairs.keySet().size() - 1) {
+                                    kShareViewActivityAction.onAnimatorEnd();
+                                    target.finish();
                                     replaceViewHandler.sendEmptyMessageDelayed(1, 500);
                                 }
                                 currentIndex[0]++;
