@@ -151,11 +151,10 @@ public class KShareViewActivityManager {
     private void startAnimation() {
 
         final int[] currentIndex = { 0 };
+        
+        kShareViewActivityAction.onAnimatorStart();
 
         for (final View v : shareViewPairs.keySet()) {
-
-            kShareViewActivityAction.onAnimatorStart();
-
             final ShareViewInfo pair = shareViewPairs.get(v);
 
             float ratioX = pair.width / v.getWidth();
