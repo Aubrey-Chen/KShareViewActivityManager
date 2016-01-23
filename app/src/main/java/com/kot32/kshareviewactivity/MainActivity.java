@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.kot32.kshareviewactivitylibrary.actions.KShareViewActivityAction;
 import com.kot32.kshareviewactivitylibrary.manager.KShareViewActivityManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,8 +31,21 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                KShareViewActivityManager.getInstance().startActivity(MainActivity.this, SecondActivity.class,
-                                                                      R.layout.activity_second, img, title);
+                // KShareViewActivityManager.getInstance().startActivity(MainActivity.this, SecondActivity.class,
+                // R.layout.activity_second, img, title);
+                KShareViewActivityManager.getInstance(MainActivity.this).withAction(new KShareViewActivityAction() {
+
+                    @Override
+                    public void onAnimatorStart() {
+
+                    }
+
+                    @Override
+                    public void onAnimatorEnd() {
+
+                    }
+                }).setDuration(800).startActivity(MainActivity.this, SecondActivity.class, R.layout.activity_second,
+                                                   img, title);
             }
         });
     }
