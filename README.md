@@ -1,9 +1,9 @@
 # KShareViewActivityManager
 一个兼容Android 5.0 以下Shared Element Transition （页面间共享元素位移动画）库
 效果图：
-![将就看吧](http://i4.tietuku.com/71be280654257885.gif)
+![将就看吧](http://i8.tietuku.com/aa5726b8302ae711.gif)
 
-图片地址：http://i4.tietuku.com/71be280654257885.gif
+图片地址：http://i8.tietuku.com/aa5726b8302ae711.gif
 
 先说缺点吧：在第一个Activity 中的目标View 是wrap_content 时，位移会偏移一点点
 
