@@ -14,10 +14,9 @@
 1.在第一个Activity中：
 
 
-              img = (ImageView) findViewById(R.id.img);
-              title = (TextView) findViewById(R.id.title);
-              KShareViewActivityManager.getInstance().startActivity(MainActivity.this, SecondActivity.class,
-                                                                                    R.layout.activity_second, img, title);
+      img = (ImageView) findViewById(R.id.img);
+      title = (TextView) findViewById(R.id.title);
+      KShareViewActivityManager.getInstance().startActivity(MainActivity.this, SecondActivity.class,R.layout.activity_second, img, title);
                                                                       
 
 上面的语句中，第三个参数 R.layout.activity_second 传入的是第二个Activity 的布局layout id，之后的参数是指需要共享元素动画的View
