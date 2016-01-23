@@ -2,9 +2,13 @@ package com.kot32.kshareviewactivity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
+
+import com.kot32.kshareviewactivitylibrary.manager.KShareViewActivityManager;
 
 public class SecondActivity extends AppCompatActivity {
 
+    private ImageView img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,7 +19,8 @@ public class SecondActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
+        KShareViewActivityManager.getInstance(SecondActivity.this).finish(SecondActivity.this);
     }
+
+
 }
