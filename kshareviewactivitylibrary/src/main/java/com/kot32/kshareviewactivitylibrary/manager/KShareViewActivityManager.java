@@ -89,7 +89,9 @@ public class KShareViewActivityManager {
         // Reflect oAReflect = Reflect.on(one);
         // Instrumentation instrumentation = oAReflect.get("mInstrumentation");
         // oAReflect.set("mInstrumentation", new AnimationInstrumentation(instrumentation));
-
+        this.shareViews.clear();
+        this.shareViewPairs.clear();
+        
         this.one = one;
         this.two = two;
         for (View v : shareViews) {
