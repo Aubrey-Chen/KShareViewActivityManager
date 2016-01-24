@@ -84,7 +84,7 @@ public class KShareViewActivityManager {
         if (INSTANCE != null && INSTANCE.one != null && INSTANCE.two != null) {
 
             INSTANCE.isMatchedFirst = activity.equals(INSTANCE.one);
-            INSTANCE.isMatchSecond = (activity.getLocalClassName().equals(INSTANCE.two.getSimpleName()));
+            INSTANCE.isMatchSecond = (activity.getClass().getSimpleName().equals(INSTANCE.two.getSimpleName()));
 
             if (INSTANCE.isMatchedFirst || INSTANCE.isMatchSecond) {
                 return INSTANCE;
