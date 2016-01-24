@@ -45,9 +45,6 @@
         
 tag一样即可
 
-2.请在Manifest.xml 中的第二个Activity 处（跳转目标Activity），设置它的
-  android:theme="@style/SecondActivityTheme"
-
 
 ##B->A （回退）
 
