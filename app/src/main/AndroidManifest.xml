@@ -18,7 +18,6 @@
         </activity>
         <activity
             android:name=".SecondActivity"
-            android:theme="@style/AppTheme"
             android:label="@string/title_activity_second" >
         </activity>
     </application>
