@@ -6,7 +6,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -23,8 +22,6 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 
 import com.kot32.kshareviewactivitylibrary.actions.KShareViewActivityAction;
-import com.kot32.kshareviewactivitylibrary.ins.AnimationInstrumentation;
-import com.kot32.kshareviewactivitylibrary.reflect.Reflect;
 
 import java.util.HashMap;
 
@@ -87,7 +84,7 @@ public class KShareViewActivityManager {
         if (INSTANCE != null && INSTANCE.one != null && INSTANCE.two != null) {
 
             INSTANCE.isMatchedFirst = activity.equals(INSTANCE.one);
-            INSTANCE.isMatchSecond = (activity.getClass().getSimpleName().equals(INSTANCE.two.getSimpleName()));
+            INSTANCE.isMatchSecond = (activity.getLocalClassName().equals(INSTANCE.two.getSimpleName()));
 
             if (INSTANCE.isMatchedFirst || INSTANCE.isMatchSecond) {
                 return INSTANCE;
@@ -108,10 +105,9 @@ public class KShareViewActivityManager {
      */
     public void startActivity(Activity one, Class two, int targetActivityLayoutResrouceID, View... shareViews) {
 
-        Reflect oAReflect = Reflect.on(one);
-        Instrumentation instrumentation = oAReflect.get("mInstrumentation");
-        oAReflect.set("mInstrumentation", new AnimationInstrumentation(instrumentation));
-
+        // Reflect oAReflect = Reflect.on(one);
+        // Instrumentation instrumentation = oAReflect.get("mInstrumentation");
+        // oAReflect.set("mInstrumentation", new AnimationInstrumentation(instrumentation));
         this.shareViews.clear();
         this.shareViewPairs.clear();
 
@@ -131,7 +127,6 @@ public class KShareViewActivityManager {
         if (isMatchedFirst || one.isDestroyed()) {
             Log.e("警告", "不能在这个页面调用finish 动画");
             finishActivity.finish();
-            finishActivity.overridePendingTransition(0, 0);
             return;
         }
         if (isMatchSecond) {
@@ -144,6 +139,7 @@ public class KShareViewActivityManager {
 
     private void startIntent() {
         Intent i = new Intent(one, two);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         one.startActivity(i);
     }
 
@@ -162,8 +158,8 @@ public class KShareViewActivityManager {
                 baseFrameLayout.removeView(secondActivityLayout);
             }
             baseFrameLayout.addView(secondActivityLayout,
-                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT));
+                                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                                 ViewGroup.LayoutParams.MATCH_PARENT));
             secondActivityLayout.setAlpha(0);
 
             viewInfo.view.post(new Runnable() {
@@ -173,7 +169,7 @@ public class KShareViewActivityManager {
                     viewInfo.width = viewInfo.view.getWidth();
                     viewInfo.height = viewInfo.view.getHeight();
                     viewInfo.locationOnScreen = new Point(getViewLocationOnScreen(viewInfo.view)[0],
-                            getViewLocationOnScreen(viewInfo.view)[1]);
+                                                          getViewLocationOnScreen(viewInfo.view)[1]);
                     synchronized (currentIndex) {
                         if (currentIndex[0] == shareViewPairs.values().size() - 1) {
                             startActivityAnimation();
@@ -190,9 +186,6 @@ public class KShareViewActivityManager {
 
     }
 
-    /**
-     * 因为有一些View 在ViewGroup 内部(如ListView 中)，直接动画会有bug，这里将View 复制后拿到最外层
-     */
     private void startActivityAnimation() {
 
         final int[] currentIndex = { 0 };
@@ -225,12 +218,12 @@ public class KShareViewActivityManager {
                     baseFrameLayout.removeView(secondActivityLayout);
 
                     ObjectAnimator translationX = ObjectAnimator.ofFloat(v,
-                            "translationX",
-                            (pair.locationOnScreen.x - getViewLocationOnScreen(v)[0]));
+                                                                         "translationX",
+                                                                         (pair.locationOnScreen.x - getViewLocationOnScreen(v)[0]));
 
                     ObjectAnimator translationY = ObjectAnimator.ofFloat(v,
-                            "translationY",
-                            (pair.locationOnScreen.y - getViewLocationOnScreen(v)[1]));
+                                                                         "translationY",
+                                                                         (pair.locationOnScreen.y - getViewLocationOnScreen(v)[1]));
 
                     AnimatorSet transAnimator = new AnimatorSet();
                     transAnimator.setDuration(duration / 3 * 2);
@@ -292,12 +285,12 @@ public class KShareViewActivityManager {
                     baseFrameLayout.removeView(secondActivityLayout);
 
                     ObjectAnimator translationX = ObjectAnimator.ofFloat(sourceView,
-                            "translationX",
-                            (getViewLocationOnScreen(v)[0] - getViewLocationOnScreen(sourceView)[0]));
+                                                                         "translationX",
+                                                                         (getViewLocationOnScreen(v)[0] - getViewLocationOnScreen(sourceView)[0]));
 
                     ObjectAnimator translationY = ObjectAnimator.ofFloat(sourceView,
-                            "translationY",
-                            (getViewLocationOnScreen(v)[1] - getViewLocationOnScreen(sourceView)[1]));
+                                                                         "translationY",
+                                                                         (getViewLocationOnScreen(v)[1] - getViewLocationOnScreen(sourceView)[1]));
 
                     AnimatorSet transAnimator = new AnimatorSet();
                     transAnimator.setDuration(duration / 3 * 2);
@@ -312,6 +305,7 @@ public class KShareViewActivityManager {
                                 if (currentIndex[0] == shareViewPairs.keySet().size() - 1) {
                                     kShareViewActivityAction.onAnimatorEnd();
                                     target.finish();
+                                    target.overridePendingTransition(0, 0);
                                     replaceViewHandler.sendEmptyMessageDelayed(1, 500);
                                 }
                                 currentIndex[0]++;
