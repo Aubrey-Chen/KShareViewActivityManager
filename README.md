@@ -85,3 +85,5 @@ tag一样即可
                                      (View) ((CommandEvent) event).obj);
 
                                                                       
+
+差点忘了，还可以 withIntent 来自定义Intent 
