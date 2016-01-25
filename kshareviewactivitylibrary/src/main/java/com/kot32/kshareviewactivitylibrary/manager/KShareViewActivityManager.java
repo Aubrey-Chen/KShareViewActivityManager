@@ -501,8 +501,6 @@ public class KShareViewActivityManager {
 
     private MarkViewInfo getViewMarkInfoFromLayout(View v, ViewGroup parent) {
 
-        // System.out.println("呵呵e:" + findSameTagChildIndexInParent(v, parent));
-
         return new MarkViewInfo(0, 0);
     }
 
