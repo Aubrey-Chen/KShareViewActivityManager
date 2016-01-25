@@ -44,8 +44,13 @@ public class MainActivity extends AppCompatActivity {
                     public void onAnimatorEnd() {
 
                     }
-                }).setDuration(800).startActivity(MainActivity.this, SecondActivity.class, R.layout.activity_second,
-                                                   img, title);
+
+                    @Override
+                    public void changeViewProperty(View view) {
+
+                    }
+                }).setDuration(800).startActivity(MainActivity.this, SecondActivity.class, R.layout.activity_main,
+                                                  R.layout.activity_second, img, title);
             }
         });
     }
