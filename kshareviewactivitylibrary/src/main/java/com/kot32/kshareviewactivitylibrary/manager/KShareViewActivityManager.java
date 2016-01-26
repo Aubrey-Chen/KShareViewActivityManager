@@ -8,19 +8,19 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kot32.kshareviewactivitylibrary.actions.KShareViewActivityAction;
@@ -34,33 +34,33 @@ import java.util.List;
  */
 public class KShareViewActivityManager {
 
-    private Activity                         one;
+    private Activity one;
 
-    private Class                            two;
+    private Class two;
 
-    private Handler                          replaceViewHandler;
+    private Handler replaceViewHandler;
 
-    private HashMap<Object, View>            shareViews     = new HashMap<>();
+    private HashMap<Object, View> shareViews = new HashMap<>();
 
-    private HashMap<View, ShareViewInfo>     shareViewPairs = new HashMap<>();
+    private HashMap<View, ShareViewInfo> shareViewPairs = new HashMap<>();
 
-    private KShareViewActivityAction         kShareViewActivityAction;
+    private KShareViewActivityAction kShareViewActivityAction;
 
-    private ViewGroup                        secondActivityLayout;
+    private ViewGroup secondActivityLayout;
 
-    private ViewGroup                        copyOfFirstActivityLayout;
+    private ViewGroup copyOfFirstActivityLayout;
 
-    private ViewGroup                        baseFrameLayout;
+    private ViewGroup baseFrameLayout;
 
-    private long                             duration       = 500;
+    private long duration = 500;
 
-    private boolean                          isMatchedFirst;
+    private boolean isMatchedFirst;
 
-    private boolean                          isMatchedSecond;
+    private boolean isMatchedSecond;
 
-    private List<View>                       copyViews      = new ArrayList<>(2);
+    private List<View> copyViews = new ArrayList<>(2);
 
-    private Intent                           mIntent;
+    private Intent mIntent;
 
     {
         replaceViewHandler = new Handler() {
@@ -178,7 +178,7 @@ public class KShareViewActivityManager {
     private void beforeAnimation() {
 
         findAllTargetViews(secondActivityLayout);
-        final int[] currentIndex = { 0 };
+        final int[] currentIndex = {0};
 
         for (final ShareViewInfo viewInfo : shareViewPairs.values()) {
 
@@ -198,6 +198,7 @@ public class KShareViewActivityManager {
                     viewInfo.height = viewInfo.view.getHeight();
                     viewInfo.locationOnScreen = new Point(getViewLocationOnScreen(viewInfo.view)[0],
                             getViewLocationOnScreen(viewInfo.view)[1]);
+
                     synchronized (currentIndex) {
                         if (currentIndex[0] == shareViewPairs.values().size() - 1) {
                             startActivityAnimation();
@@ -219,17 +220,15 @@ public class KShareViewActivityManager {
      */
     private void startActivityAnimation() {
 
-        final int[] currentIndex = { 0 };
+        final int[] currentIndex = {0};
         for (final View v : shareViewPairs.keySet()) {
-
-            // 将这些View 拿出来放在baseFrameLayout 中，使用TAG 和序号去标记一个View
 
             final View copyOfView = copyOfFirstActivityLayout.findViewWithTag(v.getTag());
             if (copyOfView == null) {
                 Log.e("警告", "传入的源View 所在xml id 错误，如果该View 在ListView 中，请传入ListView 的Item 布局xml");
                 startIntent();
+                return;
             }
-            //
             if (copyOfView.getParent() != null) {
                 if (!copyOfView.getParent().getClass().getSimpleName().equals("ViewRootImpl")) {
                     ((ViewGroup) copyOfView.getParent()).removeView(copyOfView);
@@ -239,15 +238,19 @@ public class KShareViewActivityManager {
             FrameLayout.LayoutParams copyParams = new FrameLayout.LayoutParams(v.getWidth(), v.getHeight());
             copyParams.setMargins(getViewLocationOnScreen(v)[0], getViewLocationOnScreen(v)[1] - getTitleHeight(one),
                     0, 0);
+            fillViewProperty(v, copyOfView);
+            kShareViewActivityAction.changeViewProperty(copyOfView);
             baseFrameLayout.addView(copyOfView, copyParams);
             copyViews.add(copyOfView);
+            copyOfView.postInvalidate();
             v.setAlpha(0);
-            kShareViewActivityAction.changeViewProperty(copyOfView);
+
             // 开始动画
             final ShareViewInfo pair = shareViewPairs.get(v);
 
             float ratioX = pair.width / v.getWidth();
             float ratioY = pair.height / v.getHeight();
+
 
             ObjectAnimator scaleX = ObjectAnimator.ofFloat(copyOfView, "scaleX", ratioX);
             ObjectAnimator scaleY = ObjectAnimator.ofFloat(copyOfView, "scaleY", ratioY);
@@ -300,7 +303,6 @@ public class KShareViewActivityManager {
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
                             synchronized (currentIndex) {
-
                                 if (currentIndex[0] == shareViewPairs.keySet().size() - 1) {
                                     kShareViewActivityAction.onAnimatorEnd();
                                     startIntent();
@@ -319,7 +321,7 @@ public class KShareViewActivityManager {
     }
 
     private void finishActivityAnimation(final Activity target) {
-        final int[] currentIndex = { 0 };
+        final int[] currentIndex = {0};
 
         for (final View v : shareViewPairs.keySet()) {
 
@@ -425,24 +427,9 @@ public class KShareViewActivityManager {
     }
 
     private int[] getViewLocationOnScreen(View view) {
-        int[] location = { 0, 0 };
+        int[] location = {0, 0};
         view.getLocationOnScreen(location);
         return location;
-    }
-
-    private Bitmap captureVisibleBitmap(View view) {
-        Bitmap mCopyBmp = null;
-        view.setDrawingCacheEnabled(true);
-        Bitmap copy = view.getDrawingCache();
-        if (null != copy) {
-            if (null != mCopyBmp) {
-                mCopyBmp.recycle();
-            }
-            mCopyBmp = Bitmap.createBitmap(copy);
-        }
-
-        view.setDrawingCacheEnabled(false);
-        return mCopyBmp;
     }
 
     private int getTitleHeight(Activity activity) {
@@ -458,50 +445,37 @@ public class KShareViewActivityManager {
 
     private static class ShareViewInfo {
 
-        public View  view;
+        public View view;
         public Point locationOnScreen;
         public float width;
         public float height;
 
-        public ShareViewInfo(View view, Point locationOnScreen){
+        public ShareViewInfo(View view, Point locationOnScreen) {
             this.view = view;
             this.locationOnScreen = locationOnScreen;
         }
 
-    }
-
-    private static class MarkViewInfo {
-
-        public Object tag;
-        public int    index;
-
-        public MarkViewInfo(int index, Object tag){
-            this.index = index;
-            this.tag = tag;
+        @Override
+        public String toString() {
+            return "ShareViewInfo{" +
+                    "view=" + view +
+                    ", locationOnScreen=" + locationOnScreen +
+                    ", width=" + width +
+                    ", height=" + height +
+                    '}';
         }
     }
 
-    private ListView isViewFromListView(View v) {
-
-        if (v.getParent().getClass().getSimpleName().equals("ViewRootImpl")) {
-            return null;
+    private void fillViewProperty(View origin, View target) {
+        if ((origin instanceof TextView) && (target instanceof TextView)) {
+            ((TextView) target).setText(((TextView) origin).getText());
+            ((TextView) target).setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) ((TextView) origin).getTextSize());
+            ((TextView) target).setTextColor(((TextView) origin).getCurrentTextColor());
+            return;
         }
-
-        View p = (View) v.getParent();
-        if (p instanceof ListView) {
-            return (ListView) p;
-        } else {
-            if (p instanceof ViewGroup) {
-                return isViewFromListView(p);
-            }
+        if ((origin instanceof ImageView) && (target instanceof ImageView)) {
+            ((ImageView) target).setImageDrawable(((ImageView) origin).getDrawable());
         }
-        return null;
-
-    }
-
-    private MarkViewInfo getViewMarkInfoFromLayout(View v, ViewGroup parent) {
-
-        return new MarkViewInfo(0, 0);
     }
 
     public KShareViewActivityManager withAction(KShareViewActivityAction action) {
