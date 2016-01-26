@@ -66,6 +66,32 @@ tag一样即可
         KShareViewActivityManager.getInstance(SecondActivity.this).finish(SecondActivity.this);
     }
 
+##注意事项
+
+因为是直接操作的Content 显示区域，所以支持Activity ，Fragment 互相跳，只要是在屏幕中显示的View，都可以进行动画
+
+由于进行动画的View 并不是原来的View，而是重新inflate 出来的，因此部分自定义属性并没有被赋值，Manager 对常见的TextView 和ImageView 的部分属性参照原View进行了复制，但如果是其他View的其他属性，还请在 changeViewProperty(View view) 这个回调函数中对其自定义属性进行设置。
+如：
+
+      KShareViewActivityManager.getInstance(this).withAction(new KShareViewActivityAction() {
+                        @Override
+                        public void onAnimatorStart() {
+                        }
+                        @Override
+                        public void onAnimatorEnd() {
+                        }
+                        @Override
+                        public void changeViewProperty(View view) {
+                            if(view.getTag().equals("text")){
+                                ((MyTextView)view).setOtherProperty(oringinTextView.getOtherProperty);
+                            }
+                            if(view.getTag().equals("xxx")){
+                                ...
+                            }
+                        }
+                    })；
+
+
 好啦
 
 ##其他用法（添加监听器，设置动画时间），以下是第二张效果图的代码：
