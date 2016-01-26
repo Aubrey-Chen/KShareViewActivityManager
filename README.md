@@ -6,9 +6,9 @@
 ## 2016 1 25 更新 支持TextView 的子类颜色渐变了
 
 效果图：
-![将就看吧](http://i8.tietuku.com/aa5726b8302ae711.gif)
+![将就看吧](http://i8.tietuku.com/820d353367a38d0c.gif)
 
-图片地址：http://i8.tietuku.com/aa5726b8302ae711.gif
+图片地址：http://i8.tietuku.com/820d353367a38d0c.gif
 
 这张是应用到自己的一个APP（还没写完） 的效果
 ![将就看吧](http://i4.tietuku.com/39966d2c684d7c06.gif)
