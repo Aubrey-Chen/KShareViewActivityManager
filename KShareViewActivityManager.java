@@ -23,8 +23,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.kot32.kshareviewactivitylibrary.actions.KShareViewActivityAction;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -493,4 +491,13 @@ public class KShareViewActivityManager {
         return this;
     }
 
+    public interface KShareViewActivityAction {
+
+        void onAnimatorStart();
+
+        void onAnimatorEnd();
+
+        void changeViewProperty(View view);
+    }
+    
 }
