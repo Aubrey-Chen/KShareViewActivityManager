@@ -1,6 +1,8 @@
 # KShareViewActivityManager
 一个兼容Android 5.0 以下Shared Element Transition （页面间共享元素位移动画）库
 
+精简到了一个类
+
 ## 2016 1 25 更新 支持TextView 的子类颜色渐变了
 
 效果图：
