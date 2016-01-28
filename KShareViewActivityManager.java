@@ -1,4 +1,3 @@
-package com.kot32.kshareviewactivitylibrary.manager;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -57,6 +56,8 @@ public class KShareViewActivityManager {
     private boolean                          isMatchedSecond;
 
     private List<View>                       copyViews      = new ArrayList<>(2);
+
+    private int                              mRequestCode   = -255;
 
     private Intent                           mIntent;
 
@@ -165,9 +166,14 @@ public class KShareViewActivityManager {
             mIntent = new Intent(one, two);
         }
         mIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        one.startActivity(mIntent);
+        if (mRequestCode != -255) {
+            one.startActivityForResult(mIntent,mRequestCode);
+        }else{
+            one.startActivity(mIntent);
+        }
         one.overridePendingTransition(0, 0);
         mIntent = null;
+        mRequestCode = -255;
     }
 
     /**
@@ -273,8 +279,8 @@ public class KShareViewActivityManager {
             View sourceView = target.getWindow().getDecorView().findViewWithTag(pair.view.getTag());
 
             startViewAnimation(sourceView, new ShareViewInfo(v, new Point(getViewLocationOnScreen(v)[0],
-                    getViewLocationOnScreen(v)[1]), v.getWidth(),
-                    v.getHeight()), currentIndex, new AnimationEnd() {
+                                                                          getViewLocationOnScreen(v)[1]), v.getWidth(),
+                                                             v.getHeight()), currentIndex, new AnimationEnd() {
 
                 @Override
                 public void onEnd() {
@@ -309,7 +315,7 @@ public class KShareViewActivityManager {
         if (origin instanceof TextView) {
             int desColor = ((TextView) target.view).getCurrentTextColor();
             colorAnimator = ObjectAnimator.ofInt(origin, "textColor", ((TextView) origin).getCurrentTextColor(),
-                    desColor);
+                                                 desColor);
             colorAnimator.setEvaluator(new ArgbEvaluator());
         }
         // 放大
@@ -433,6 +439,12 @@ public class KShareViewActivityManager {
 
     public KShareViewActivityManager withIntent(Intent intent) {
         this.mIntent = intent;
+        return this;
+    }
+
+    public KShareViewActivityManager withIntentAndRequestCode(Intent intent, int requestCode) {
+        this.mIntent = intent;
+        this.mRequestCode = requestCode;
         return this;
     }
 
