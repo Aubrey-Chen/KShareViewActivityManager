@@ -114,7 +114,7 @@ tag一样即可
 
                                                                       
 
-差点忘了，还可以 withIntent 来自定义Intent 
+差点忘了，还可以 withIntent 来自定义Intent ,同时 withIntentAndRequestCode(Intent intent,int requestCode) 也可以达到startActivityForResult 的目的。
 
 
 # License
