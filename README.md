@@ -11,9 +11,13 @@
 图片地址：http://i8.tietuku.com/820d353367a38d0c.gif
 
 这张是应用到自己的一个APP（还没写完） 的效果
-![将就看吧](http://i4.tietuku.com/39966d2c684d7c06.gif)
 
-图片地址：http://i4.tietuku.com/39966d2c684d7c06.gif
+![将就看吧](http://i4.tietuku.com/d609f96f6f5b1717.gif)
+
+图片地址：http://i4.tietuku.com/d609f96f6f5b1717.gif
+
+
+APP 名字叫番茄ToDo，是一个番茄钟和ToDoList 结合的APP（对，我就是嫌番茄土豆太难用太反人类了自己写的）喜欢的朋友可以支持一下:D
 
 
 先说缺点吧：在第一个Activity 中的目标View 是wrap_content 时，位移会偏移一点点
