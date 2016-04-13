@@ -6,18 +6,12 @@
 ## 2016 1 25 更新 支持TextView 的子类颜色渐变了
 
 效果图：
-![将就看吧](http://i8.tietuku.com/820d353367a38d0c.gif)
+![将就看吧](http://image17-c.poco.cn/mypoco/myphoto/20160413/11/17425403720160413113956013.gif?415x620_110)
 
-图片地址：http://i8.tietuku.com/820d353367a38d0c.gif
-
-这张是应用到自己的一个APP（还没写完） 的效果
-
-![将就看吧](http://i4.tietuku.com/d609f96f6f5b1717.gif)
-
-图片地址：http://i4.tietuku.com/d609f96f6f5b1717.gif
+图片地址：http://image17-c.poco.cn/mypoco/myphoto/20160413/11/17425403720160413113956013.gif?415x620_110
 
 
-APP 名字叫番茄ToDo，是一个番茄钟和ToDoList 结合的APP（对，我就是嫌番茄土豆太难用太反人类了自己写的）喜欢的朋友可以支持一下:D
+最近开发了一个APP 名字叫番茄ToDo，是一个番茄钟和ToDoList结合的APP（对，我就是嫌番茄土豆太难用太反人类了自己写的）喜欢的朋友可以支持一下:D，各大应用商店都可以下载。
 
 
 先说缺点吧：在第一个Activity 中的目标View 是wrap_content 时，位移会偏移一点点
